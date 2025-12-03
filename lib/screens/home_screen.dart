@@ -292,7 +292,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // --- Horizontal Card Widget ---
+// --- Horizontal Card Widget ---
   Widget _buildFoodCard(BuildContext context, FoodItem item) {
     return GestureDetector(
       onTap: () {
@@ -359,110 +359,138 @@ class _HomeScreenState extends State<HomeScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    // Top Row: Name and Price
-                    Row(
+                    // --- 1. Top Section (Name, Price & Description) ---
+                    Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Expanded(
-                          child: Text(
-                            item.name,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.bold,
-                              height: 1.2,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
+                        // Row for Name & Price
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            if (item.discountedPrice == 0)
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 8, vertical: 4),
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFF16A34A),
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: const Text(
-                                  "FREE",
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              )
-                            else ...[
-                              Text(
-                                "RM${item.discountedPrice.toStringAsFixed(2)}",
+                            Expanded(
+                              child: Text(
+                                item.name,
+                                maxLines: 1, 
+                                overflow: TextOverflow.ellipsis,
                                 style: const TextStyle(
-                                  color: Color(0xFF16A34A),
+                                  fontSize: 15,
                                   fontWeight: FontWeight.bold,
-                                  fontSize: 14,
+                                  height: 1.2,
                                 ),
                               ),
-                              if (item.originalPrice > item.discountedPrice)
-                                Text(
-                                  "RM${item.originalPrice.toStringAsFixed(2)}",
-                                  style: const TextStyle(
-                                    decoration: TextDecoration.lineThrough,
-                                    color: Colors.grey,
-                                    fontSize: 10,
+                            ),
+                            const SizedBox(width: 8),
+                            // Price Column
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                if (item.discountedPrice == 0)
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 8, vertical: 4),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFF16A34A),
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: const Text(
+                                      "FREE",
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  )
+                                else ...[
+                                  Text(
+                                    "RM${item.discountedPrice.toStringAsFixed(2)}",
+                                    style: const TextStyle(
+                                      color: Color(0xFF16A34A),
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 14,
+                                    ),
                                   ),
-                                ),
-                            ]
+                                  if (item.originalPrice > item.discountedPrice)
+                                    Text(
+                                      "RM${item.originalPrice.toStringAsFixed(2)}",
+                                      style: const TextStyle(
+                                        decoration: TextDecoration.lineThrough,
+                                        color: Colors.grey,
+                                        fontSize: 10,
+                                      ),
+                                    ),
+                                ]
+                              ],
+                            ),
                           ],
                         ),
-                      ],
-                    ),
-
-                    // Middle: Location
-                    Row(
-                      children: [
-                        const Icon(Icons.location_on_outlined,
-                            size: 14, color: Colors.grey),
-                        const SizedBox(width: 4),
-                        Expanded(
-                          child: Text(
-                            item.cafe,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              color: Colors.grey,
-                              fontSize: 12,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    // Bottom: Stock & Time
-                    Row(
-                      children: [
-                        Icon(Icons.inventory_2_outlined,
-                            size: 14, color: Colors.grey[600]),
-                        const SizedBox(width: 4),
+                        
+                        // Description Text
+                        const SizedBox(height: 4),
                         Text(
-                          "${item.availableQuantity} left",
-                          style:
-                              TextStyle(fontSize: 12, color: Colors.grey[700]),
-                        ),
-                        const SizedBox(width: 12),
-                        Icon(Icons.access_time,
-                            size: 14, color: Colors.grey[600]),
-                        const SizedBox(width: 4),
-                        Expanded(
-                          child: Text(
-                            item.pickupTime,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                                fontSize: 12, color: Colors.grey[700]),
+                          item.description.isNotEmpty 
+                              ? item.description 
+                              : "No description available",
+                          maxLines: 2, 
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey[500],
+                            height: 1.2,
                           ),
+                        ),
+                      ],
+                    ),
+
+                    // --- 2. Bottom Section (Location, Stock, Time) ---
+                    Column(
+                      children: [
+                        // Location Row
+                        Row(
+                          children: [
+                            const Icon(Icons.location_on_outlined,
+                                size: 14, color: Colors.grey),
+                            const SizedBox(width: 4),
+                            Expanded(
+                              child: Text(
+                                item.cafe,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 4),
+                        
+                        // Stock & Time Row
+                        Row(
+                          children: [
+                            Icon(Icons.inventory_2_outlined,
+                                size: 14, color: Colors.grey[600]),
+                            const SizedBox(width: 4),
+                            Text(
+                              "${item.availableQuantity} left",
+                              style: TextStyle(
+                                  fontSize: 12, color: Colors.grey[700]),
+                            ),
+                            const SizedBox(width: 12),
+                            Icon(Icons.access_time,
+                                size: 14, color: Colors.grey[600]),
+                            const SizedBox(width: 4),
+                            Expanded(
+                              child: Text(
+                                item.pickupTime,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                    fontSize: 12, color: Colors.grey[700]),
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
