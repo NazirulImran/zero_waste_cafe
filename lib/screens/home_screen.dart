@@ -89,14 +89,14 @@ class _HomeScreenState extends State<HomeScreen> {
                         'ZeroWaste Cafe',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          fontSize: 20,
+                          fontSize: 25,
                           height: 1.2,
                         ),
                       ),
                       Text(
                         'Save Cash, Cut Trash',
                         style: TextStyle(
-                          fontSize: 12,
+                          fontSize: 15,
                           fontStyle: FontStyle.italic,
                           fontWeight: FontWeight.w400,
                           color: Colors.white70,
@@ -115,14 +115,6 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: const Color(0xFF16A34A),
         foregroundColor: Colors.white,
         automaticallyImplyLeading: false,
-        actions: _selectedIndex == 0
-            ? [
-                IconButton(
-                  icon: const Icon(Icons.notifications_outlined),
-                  onPressed: () {},
-                ),
-              ]
-            : null,
       ),
       body: _selectedIndex == 0
           ? Column(

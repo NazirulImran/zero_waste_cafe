@@ -148,7 +148,7 @@ class _AddFoodModalState extends State<AddFoodModal> {
                     controller: _nameController,
                     decoration: const InputDecoration(
                       labelText: 'Food Name *',
-                      hintText: 'e.g., Nasi Lemak Special',
+                      hintText: 'e.g., Nasi Lemak Bunian',
                       border: OutlineInputBorder(),
                     ),
                     validator: (value) =>
@@ -173,7 +173,7 @@ class _AddFoodModalState extends State<AddFoodModal> {
                   Container(
                     decoration: BoxDecoration(
                       color: const Color(0xFFF0FDF4),
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(20),
                       border: Border.all(color: const Color(0xFFDCFCE7)),
                     ),
                     child: CheckboxListTile(
@@ -186,13 +186,13 @@ class _AddFoodModalState extends State<AddFoodModal> {
                           }
                         });
                       },
-                      title: const Text("Offer this item for free"),
-                      activeColor: const Color(0xFF16A34A),
+                      title: const Text("Offer this food for free"),
+                      activeColor: const Color.fromARGB(255, 22, 180, 80),
                       controlAffinity: ListTileControlAffinity.leading,
                       contentPadding: EdgeInsets.zero,
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 12),
 
                   // --- 3. Prices ---
                   Row(
@@ -265,7 +265,7 @@ class _AddFoodModalState extends State<AddFoodModal> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const Text("From", style: TextStyle(color: Colors.grey)),
-                            const SizedBox(height: 4),
+                            const SizedBox(height: 2),
                             Row(
                               children: [
                                 Expanded(
@@ -299,7 +299,7 @@ class _AddFoodModalState extends State<AddFoodModal> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const Text("To", style: TextStyle(color: Colors.grey)),
-                            const SizedBox(height: 4),
+                            const SizedBox(height: 2),
                             Row(
                               children: [
                                 Expanded(
