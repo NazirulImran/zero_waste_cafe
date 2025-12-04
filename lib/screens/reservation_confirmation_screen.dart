@@ -1,28 +1,36 @@
-// ⚠️ REFERENCE CODE ONLY - WILL NOT RUN IN FIGMA MAKE
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import '../models/app_state.dart';
+import '../models/reservation.dart'; // Ensure this import exists
 import 'home_screen.dart';
-import 'profile_screen.dart';
 
 class ReservationConfirmationScreen extends StatelessWidget {
-  const ReservationConfirmationScreen({super.key});
+  // 1. Accept optional reservation so Profile can pass it in
+  final Reservation? reservation;
+
+  const ReservationConfirmationScreen({
+    super.key,
+    this.reservation,
+  });
 
   @override
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context);
-    final reservation = appState.currentReservation;
+    
+    // 2. Determine which reservation to show
+    // (Use the passed one, or fall back to the "current" one in state)
+    final displayReservation = reservation ?? appState.currentReservation;
 
-    if (reservation == null) {
+    if (displayReservation == null) {
       return const HomeScreen();
     }
 
-    final isPending = reservation.isPending;
+    final isPending = displayReservation.isPending;
 
     return Scaffold(
       body: Container(
+        height: double.infinity,
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
@@ -37,7 +45,7 @@ class ReservationConfirmationScreen extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Success Icon
+                  // --- Success Icon ---
                   Container(
                     width: 80,
                     height: 80,
@@ -47,15 +55,15 @@ class ReservationConfirmationScreen extends StatelessWidget {
                           : const Color(0xFF3B82F6),
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(
-                      Icons.check_circle,
+                    child: Icon(
+                      isPending ? Icons.history : Icons.check_circle,
                       color: Colors.white,
                       size: 48,
                     ),
                   ),
                   const SizedBox(height: 24),
 
-                  // Title
+                  // --- Title ---
                   Text(
                     isPending ? 'Reservation Successful!' : 'Pickup Successful!',
                     style: TextStyle(
@@ -68,7 +76,7 @@ class ReservationConfirmationScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
 
-                  // Subtitle
+                  // --- Subtitle ---
                   Text(
                     isPending
                         ? 'Your food has been reserved. Show this code during pickup.'
@@ -81,7 +89,7 @@ class ReservationConfirmationScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 32),
 
-                  // QR Code and Details Card
+                  // --- QR Code and Details Card ---
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.all(24),
@@ -99,19 +107,21 @@ class ReservationConfirmationScreen extends StatelessWidget {
                     child: Column(
                       children: [
                         // QR Code
-                        Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: Colors.grey[100],
-                            borderRadius: BorderRadius.circular(12),
+                        if (isPending) ...[
+                          Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: Colors.grey[100],
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: QrImageView(
+                              data: displayReservation.pickupCode,
+                              version: QrVersions.auto,
+                              size: 150,
+                            ),
                           ),
-                          child: QrImageView(
-                            data: reservation.pickupCode,
-                            version: QrVersions.auto,
-                            size: 150,
-                          ),
-                        ),
-                        const SizedBox(height: 16),
+                          const SizedBox(height: 16),
+                        ],
 
                         // Pickup Code
                         Container(
@@ -136,7 +146,7 @@ class ReservationConfirmationScreen extends StatelessWidget {
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                reservation.pickupCode,
+                                displayReservation.pickupCode,
                                 style: const TextStyle(
                                   fontSize: 24,
                                   fontWeight: FontWeight.bold,
@@ -149,12 +159,12 @@ class ReservationConfirmationScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 24),
 
-                        // Food Details
+                        // Food Details Divider
                         Divider(color: Colors.grey[200]),
                         const SizedBox(height: 16),
 
                         Text(
-                          reservation.foodItem.name,
+                          displayReservation.foodItem.name,
                           style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
@@ -165,58 +175,63 @@ class ReservationConfirmationScreen extends StatelessWidget {
                         _buildDetailRow(
                           Icons.location_on,
                           'Pickup Location',
-                          reservation.foodItem.cafe,
+                          displayReservation.foodItem.cafe,
                         ),
                         const SizedBox(height: 12),
                         _buildDetailRow(
                           Icons.access_time,
                           'Pickup Time',
-                          reservation.foodItem.pickupTime,
+                          displayReservation.foodItem.pickupTime,
                         ),
                         const SizedBox(height: 12),
                         _buildDetailRow(
                           Icons.shopping_bag_outlined,
                           'Quantity',
-                          reservation.quantity.toString(),
+                          displayReservation.quantity.toString(),
                         ),
                       ],
                     ),
                   ),
                   const SizedBox(height: 24),
 
-                  // Important Notice
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFFEF3C7),
-                      border: Border.all(color: const Color(0xFFFBBF24)),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: const Row(
-                      children: [
-                        Text('⚠️', style: TextStyle(fontSize: 20)),
-                        SizedBox(width: 12),
-                        Expanded(
-                          child: Text(
-                            'Please arrive during the pickup time window.',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Color(0xFF92400E),
+                  // --- Important Notice ---
+                  if (isPending)
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFEF3C7),
+                        border: Border.all(color: const Color(0xFFFBBF24)),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Row(
+                        children: [
+                          Text('⚠️', style: TextStyle(fontSize: 20)),
+                          SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              'Please arrive during the pickup time window.',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Color(0xFF92400E),
+                              ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
                   const SizedBox(height: 24),
 
-                  // Action Buttons
-                  if (isPending)
+                  // ========================================================
+                  // BUTTONS SECTION (Restored to match your request)
+                  // ========================================================
+
+                  // 1. "I've Picked Up" Button (Only if pending)
+                  if (isPending) ...[
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
                         onPressed: () {
-                          appState.markAsPickedUp(reservation.id);
+                          appState.markAsPickedUp(displayReservation.id);
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF3B82F6),
@@ -232,46 +247,52 @@ class ReservationConfirmationScreen extends StatelessWidget {
                         ),
                       ),
                     ),
-                  if (isPending) const SizedBox(height: 12),
+                    const SizedBox(height: 12),
+                  ],
 
+                  // 2. "View My Reservations" Button
                   SizedBox(
-  width: double.infinity,
-  child: ElevatedButton(
-    onPressed: () {
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(
-          // ⚠️ FIX: Navigate to HomeScreen, but force it to start on Tab 1 (Profile)
-          builder: (context) => const HomeScreen(initialIndex: 1),
-        ),
-        (route) => false,
-      );
-    },
-    style: ElevatedButton.styleFrom(
-      backgroundColor: const Color(0xFF16A34A),
-      foregroundColor: Colors.white,
-      padding: const EdgeInsets.symmetric(vertical: 16),
-    ),
-    child: const Text(
-      'View My Reservations', // Or "Back to Home"
-      style: TextStyle(
-        fontSize: 16,
-        fontWeight: FontWeight.bold,
-      ),
-    ),
-  ),
-),
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        // Navigate to Home, but switch to Profile Tab (index 1)
+                        Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                const HomeScreen(initialIndex: 1),
+                          ),
+                          (route) => false,
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF16A34A),
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                      ),
+                      child: const Text(
+                        'View My Reservations',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
                   const SizedBox(height: 12),
 
+                  // 3. "Back to Home" Button
                   SizedBox(
                     width: double.infinity,
                     child: OutlinedButton(
                       onPressed: () {
                         appState.clearCurrentReservation();
+                        // Navigate to Home, Tab 0
                         Navigator.pushAndRemoveUntil(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const HomeScreen(),
+                            builder: (context) =>
+                                const HomeScreen(initialIndex: 0),
                           ),
                           (route) => false,
                         );

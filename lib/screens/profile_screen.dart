@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/app_state.dart';
-// Ensure this import points to your actual ReservationCard file
-import '../widgets/reservation_card.dart'; 
+import '../widgets/reservation_card.dart';
+// Import the confirmation screen
+import 'reservation_confirmation_screen.dart'; 
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -11,14 +12,10 @@ class ProfileScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context);
 
-    // ⚠️ FIXED: Removed Scaffold, AppBar, and BottomNavigationBar.
-    // We only return the SingleChildScrollView so it fits inside HomeScreen's body.
     return SingleChildScrollView(
       child: Column(
         children: [
           // --- Profile Header ---
-          // Note: Since this has a "My Profile" title, you might want to 
-          // hide the AppBar in HomeScreen when on this tab to avoid double titles.
           Container(
             width: double.infinity,
             decoration: const BoxDecoration(
@@ -42,7 +39,7 @@ class ProfileScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
                 const Text(
-                  'Nazirul Imran Ismail',
+                  'UMT Student',
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -51,10 +48,9 @@ class ProfileScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  's72574@ocean.umt.edu.my',
+                  'student@umt.edu.my',
                   style: TextStyle(
                     fontSize: 14,
-                    fontStyle: FontStyle.italic,
                     color: Colors.white.withOpacity(0.9),
                   ),
                 ),
@@ -169,17 +165,30 @@ class ProfileScreen extends StatelessWidget {
                       )
                     : ListView.builder(
                         shrinkWrap: true,
-                        // Important: Disable scrolling here so the parent SingleChildScrollView handles it
                         physics: const NeverScrollableScrollPhysics(),
                         itemCount: appState.reservations.length,
                         itemBuilder: (context, index) {
                           final reservation = appState.reservations[index];
-                          // Use your existing ReservationCard widget
-                          return ReservationCard(
-                            reservation: reservation,
-                            onMarkAsPickedUp: () {
-                              appState.markAsPickedUp(reservation.id);
+                          
+                          // ⚠️ CHANGED: Wrapped in GestureDetector
+                          return GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => 
+                                    ReservationConfirmationScreen(
+                                      reservation: reservation // Pass specific item
+                                    ),
+                                ),
+                              );
                             },
+                            child: ReservationCard(
+                              reservation: reservation,
+                              onMarkAsPickedUp: () {
+                                appState.markAsPickedUp(reservation.id);
+                              },
+                            ),
                           );
                         },
                       ),
