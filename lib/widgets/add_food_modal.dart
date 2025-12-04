@@ -384,7 +384,7 @@ class _AddFoodModalState extends State<AddFoodModal> {
   Widget _buildTimeDropdown(
       List<String> items, String value, Function(String?) onChanged) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 11), // Reduced padding slightly
       decoration: BoxDecoration(
         border: Border.all(color: Colors.grey[400]!),
         borderRadius: BorderRadius.circular(8),
@@ -393,8 +393,26 @@ class _AddFoodModalState extends State<AddFoodModal> {
         child: DropdownButton<String>(
           value: value,
           isExpanded: true,
+          // 1. Add 'isDense' to compact the layout
+          isDense: true, 
+          // 2. Set the style for the SELECTED item text
+          style: const TextStyle(
+            color: Colors.black87,
+            fontSize: 13, // <--- Smaller font size (try 12 or 13)
+            fontWeight: FontWeight.w500,
+          ),
           items: items.map((item) {
-            return DropdownMenuItem(value: item, child: Text(item));
+            return DropdownMenuItem(
+              value: item,
+              // 3. Set the style for the MENU items text
+              child: Text(
+                item,
+                style: const TextStyle(
+                  fontSize: 13, // <--- Match the size here
+                  color: Colors.black87,
+                ),
+              ),
+            );
           }).toList(),
           onChanged: onChanged,
         ),
